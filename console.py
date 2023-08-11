@@ -5,11 +5,38 @@ This program contains the entry point of the command intepreter
 
 import cmd
 from models.base_model import BaseModel
+from models.user import User
+from models.city import City
+from models.place import Place
+from models.amenity import Amenity
+from models.review import Review
+from models.state import State
+
 from models import storage
 
 
-class hbnb_cmd(cmd.Cmd):
-    intro = "\nWelcome to the hbnb console\n\n"
+class HBNBCommand(cmd.Cmd):
+    # intro = r"""
+    #
+    #
+    # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    # @@@          #####                                                           @@
+    # @@@        ##     ##                                                         @@
+    # @@@       #*   ((   #              ###        ##                  ##         @@
+    # @@@     ##   /( (((  ##            ###        ##                  ##         @@
+    # @@@    ##    ((((((   ##           #########  #######   ########  ########   @@
+    # @@@   ##    ((((       ##          ###    ##  ##    ### ###   ### ##     ##  @@
+    # @@@  ##     (((((       ##         ###    ##  ##     ## ###   ### ##     ### @@
+    # @@@ #         *(          #        ###    ##  ########  ###   ### ########   @@
+    # @@@ ##         (((         ##                                                @@
+    # @@@ ##.     ##   ##     ###                                                  @@
+    # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    #
+    #
+    # Welcome to the hbnb console
+    # """
     prompt = "(hbnb) "
 
     hbnb_cmd_list = [
@@ -55,36 +82,82 @@ class hbnb_cmd(cmd.Cmd):
         """
         pass
 
-    def do_help(self, arg: str):
+    # def do_help(self, arg: str):
+    #     """
+    #     This method displays custom help messages
+    #     Args:
+    #         arg:
+    #
+    #     Returns:
+    #
+    #     """
+    #     if arg:
+    #         super().do_help(arg)
+    #     else:
+    #         help_msg = r"""
+    #         Available Commands(For detailed explanation including
+    #         examples, run help <command>):
+    #
+    #         EOF or quit :   Exits the shell
+    #         help        :   Displays this list
+    #         create      :   Creates a new instance
+    #         show        :   Prints a string representation of an
+    #                         instance based on class name
+    #         destroy     :   Deletes an instance based on the class
+    #                         name and ID
+    #         all         :   Prints all string representation of all instances
+    #         update      :   Updates an instance based on the class name and id
+    #                         by adding or updating attribute (save the change into
+    #                         the JSON file).
+    #         """
+    #
+    #         print(help_msg)
+
+    def default(self, arg):
         """
-        This method displays custom help messages
+        This method handles teh default command format where the class name
+        comes first before the task
         Args:
-            arg:
+            arg: The arguments passed
 
         Returns:
 
         """
-        if arg:
-            super().do_help(arg)
-        else:
-            help_msg = r"""
-            Available Commands(For detailed explanation including
-            examples, run help <command>):
-            
-            EOF or quit :   Exits the shell
-            help        :   Displays this list
-            create      :   Creates a new instance
-            show        :   Prints a string representation of an
-                            instance based on class name
-            destroy     :   Deletes an instance based on the class
-                            name and ID
-            all         :   Prints all string representation of all instances
-            update      :   Updates an instance based on the class name and id
-                            by adding or updating attribute (save the change into
-                            the JSON file).
-            """
-
-            print(help_msg)
+        args = arg.strip('()').split(".")
+        if len(args) < 2:
+            print("*** Incomplete command ***")
+            return
+        all_objs = storage.all()
+        cls_name = args[0]
+        cmd_name = args[1].lower()
+        cmd_and_attrib = cmd_name.strip(')').split('(')
+        cmd_name = cmd_and_attrib[0]
+        if cmd_name == "all":
+            HBNBCommand.do_all(self, cls_name)
+        elif cmd_name == "count":
+            HBNBCommand.do_count(self, cls_name)
+        elif cmd_name == "show":
+            if len(cmd_and_attrib) < 2:
+                print('** instance id missing **')
+            else:
+                HBNBCommand.do_show(self, cls_name + ' ' + cmd_and_attrib[1])
+        elif cmd_name == "destroy":
+            if len(cmd_and_attrib) < 2:
+                print("** instance id missing **")
+            else:
+                HBNBCommand.do_destroy(self, cls_name + ' ' + cmd_and_attrib[1])
+        elif cmd_name == "update":
+            update_params = cmd_and_attrib[1].split(",")
+            if len(update_params) < 1:
+                print("** instance id missing **")
+            elif len(update_params) < 2:
+                print("** attribute name missing **")
+            elif len(update_params) < 3:
+                print("** value missing **")
+            else:
+                HBNBCommand.do_update(self,
+                                      cls_name + ' ' + update_params[0] + ' ' + update_params[1] + ' ' + update_params[
+                                          2])
 
     #         Custom Commands
 
@@ -104,7 +177,7 @@ class hbnb_cmd(cmd.Cmd):
         """
         if len(cls_name) == 0:
             print("** class name missing **")
-        elif cls_name not in hbnb_cmd.hbnb_cmd_list:
+        elif cls_name not in HBNBCommand.hbnb_cmd_list:
             print("** class doesn't exist **")
         else:
             print(eval(cls_name)().id)
@@ -128,7 +201,7 @@ class hbnb_cmd(cmd.Cmd):
         objs = storage.all()
         if len(args) == 0:
             print("** class name missing **")
-        elif args[0] not in hbnb_cmd.hbnb_cmd_list:
+        elif args[0] not in HBNBCommand.hbnb_cmd_list:
             print("** class doesn't exist **")
         elif len(args) == 1:
             print("** instance id missing **")
@@ -156,13 +229,12 @@ class hbnb_cmd(cmd.Cmd):
 
         if len(args) == 0:
             print("** class name missing **")
-        elif args[0] not in hbnb_cmd.hbnb_cmd_list:
+        elif args[0] not in HBNBCommand.hbnb_cmd_list:
             print("** class doesn't exist **")
         elif len(args) == 1:
             print("** instance id missing **")
         elif f"{args[0]}.{args[1]}" not in objs:
             print("** no instance found **")
-            print(objs)
         else:
             del objs[f"{args[0]}.{args[1]}"]
             storage.save()
@@ -182,7 +254,7 @@ class hbnb_cmd(cmd.Cmd):
 
         """
         args = cls_name.split()
-        if len(args) > 0 and args[0] not in hbnb_cmd.hbnb_cmd_list:
+        if len(args) > 0 and args[0] not in HBNBCommand.hbnb_cmd_list:
             print("** class doesn't exist **")
         else:
             object_list = []
@@ -214,7 +286,7 @@ class hbnb_cmd(cmd.Cmd):
 
         if len(args) == 0:
             print("** class name missing **")
-        elif args[0] not in hbnb_cmd.hbnb_cmd_list:
+        elif args[0] not in HBNBCommand.hbnb_cmd_list:
             print("** class doesn't exist **")
         elif len(args) == 1:
             print("** instance id missing **")
@@ -224,8 +296,16 @@ class hbnb_cmd(cmd.Cmd):
             print("** attribute name missing **")
         elif len(args) == 3:
             print("** value missing **")
-        elif len(args) > 4:
-            del args[4:]
+        # elif len(args) > 4:
+        #     del args[4:]
+        elif type(args[2]) == dict:
+            our_obj = objs[f"{args[0]}.{args[1]}"]
+            for k, v in args[2].items():
+                attr_type = type(our_obj.__class__.__dict__[k])
+                if k in our_obj.__class__.__dict__.keys() and attr_type in [str, int, float]:
+                    our_obj.__dict__[k] = attr_type(v)
+                else:
+                    our_obj.__dict__[k] = v
         else:
             our_obj = objs[f"{args[0]}.{args[1]}"]
             if args[2] in our_obj.__class__.__dict__.keys():
@@ -233,8 +313,30 @@ class hbnb_cmd(cmd.Cmd):
                 our_obj.__dict__[args[2]] = attr_type(args[3])
             else:
                 our_obj.__dict__[args[2]] = args[3]
-        storage.save()
+        BaseModel.save(self)
+
+    def do_count(self, arg):
+        """
+        This method counts the number of instances of a class
+        Args:
+            arg:
+
+        Example:
+            count User
+        Returns:
+
+        """
+        count = 0
+        args = arg.split()
+        if len(args) > 0 and args[0] not in HBNBCommand.hbnb_cmd_list:
+            print("** class doesn't exist **")
+        else:
+
+            for i in storage.all().values():
+                if len(args) == 1 and args[0] == i.__class__.__name__:
+                    count += 1
+        print(count)
+
 
 if __name__ == "__main__":
-    console = hbnb_cmd()
-    console.cmdloop()
+    HBNBCommand().cmdloop()

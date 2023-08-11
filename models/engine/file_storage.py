@@ -6,6 +6,12 @@ This module contains the class File storage which handles serialization and dese
 import datetime
 import json
 from models.base_model import BaseModel
+from models.user import User
+from models.city import City
+from models.place import Place
+from models.amenity import Amenity
+from models.review import Review
+from models.state import State
 
 
 class FileStorage:
@@ -57,17 +63,19 @@ class FileStorage:
                 if isinstance(value, datetime.datetime):
                     obj_data[key] = value.strftime(BaseModel.DATE_FORMAT)
 
-        with open("file.json", mode="w") as json_file:
+        with open(FileStorage.__file_path, mode="w") as json_file:
             json.dump(object_dictionary, json_file)
 
     def reload(self):
         """
         deserializes the JSON file to __objects (only if the JSON file (__file_path) exists ; otherwise, do nothing.
-        If the file doesn't exist, no exception should be raised) Returns:
+        If the file doesn't exist, no exception should be raised)
+
+        Returns:
 
         """
         try:
-            with open("file.json") as json_file:
+            with open(FileStorage.__file_path) as json_file:
                 reloaded_dict = json.load(json_file)
                 for obj_data in reloaded_dict.values():
                     if "__class__" in obj_data:
