@@ -14,7 +14,7 @@ from time import sleep
 from models.city import City
 
 
-class TestCity_instantiation(unittest.TestCase):
+class TestCityInstantiation(unittest.TestCase):
     """Unittests for testing instantiation of the City class."""
 
     def test_no_args_instantiates(self):
@@ -90,11 +90,11 @@ class TestCity_instantiation(unittest.TestCase):
             City(id=None, created_at=None, updated_at=None)
 
 
-class TestCity_save(unittest.TestCase):
+class TestCitySave(unittest.TestCase):
     """Unittests for testing save method of the City class."""
 
     @classmethod
-    def setUp(self):
+    def setUp(cls):
         try:
             os.rename("file.json", "tmp")
         except IOError:
@@ -131,7 +131,7 @@ class TestCity_save(unittest.TestCase):
     def test_save_with_arg(self):
         cy = City()
         with self.assertRaises(TypeError):
-            cy.save(None)
+            cy.save()
 
     def test_save_updates_file(self):
         cy = City()
@@ -141,7 +141,7 @@ class TestCity_save(unittest.TestCase):
             self.assertIn(cyid, f.read())
 
 
-class TestCity_to_dict(unittest.TestCase):
+class TestCityToDict(unittest.TestCase):
     """Unittests for testing to_dict method of the City class."""
 
     def test_to_dict_type(self):
@@ -188,7 +188,7 @@ class TestCity_to_dict(unittest.TestCase):
     def test_to_dict_with_arg(self):
         cy = City()
         with self.assertRaises(TypeError):
-            cy.to_dict(None)
+            cy.to_dict()
 
 
 if __name__ == "__main__":

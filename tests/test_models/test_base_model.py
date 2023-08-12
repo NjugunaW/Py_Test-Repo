@@ -14,7 +14,7 @@ from time import sleep
 from models.base_model import BaseModel
 
 
-class TestBaseModel_instantiation(unittest.TestCase):
+class TestBaseModelInstantiation(unittest.TestCase):
     """Unittests for testing instantiation of the BaseModel class."""
 
     def test_no_args_instantiates(self):
@@ -86,18 +86,18 @@ class TestBaseModel_instantiation(unittest.TestCase):
         self.assertEqual(bm.updated_at, dt)
 
 
-class TestBaseModel_save(unittest.TestCase):
+class TestBaseModelSave(unittest.TestCase):
     """Unittests for testing save method of the BaseModel class."""
 
     @classmethod
-    def setUp(self):
+    def setUp(cls):
         try:
             os.rename("file.json", "tmp")
         except IOError:
             pass
 
     @classmethod
-    def tearDown(self):
+    def tearDown(cls):
         try:
             os.remove("file.json")
         except IOError:
@@ -128,7 +128,7 @@ class TestBaseModel_save(unittest.TestCase):
     def test_save_with_arg(self):
         bm = BaseModel()
         with self.assertRaises(TypeError):
-            bm.save(None)
+            bm.save()
 
     def test_save_updates_file(self):
         bm = BaseModel()
@@ -138,7 +138,7 @@ class TestBaseModel_save(unittest.TestCase):
             self.assertIn(bmid, f.read())
 
 
-class TestBaseModel_to_dict(unittest.TestCase):
+class TestBaseModelToDict(unittest.TestCase):
     """Unittests for testing to_dict method of the BaseModel class."""
 
     def test_to_dict_type(self):
@@ -185,7 +185,7 @@ class TestBaseModel_to_dict(unittest.TestCase):
     def test_to_dict_with_arg(self):
         bm = BaseModel()
         with self.assertRaises(TypeError):
-            bm.to_dict(None)
+            bm.to_dict()
 
 
 if __name__ == "__main__":

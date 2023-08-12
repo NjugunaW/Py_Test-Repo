@@ -14,7 +14,7 @@ from time import sleep
 from models.review import Review
 
 
-class TestReview_instantiation(unittest.TestCase):
+class TestReviewInstantiation(unittest.TestCase):
     """Unittests for testing instantiation of the Review class."""
 
     def test_no_args_instantiates(self):
@@ -96,11 +96,11 @@ class TestReview_instantiation(unittest.TestCase):
             Review(id=None, created_at=None, updated_at=None)
 
 
-class TestReview_save(unittest.TestCase):
+class TestReviewSave(unittest.TestCase):
     """Unittests for testing save method of the Review class."""
 
     @classmethod
-    def setUp(self):
+    def setUp(cls):
         try:
             os.rename("file.json", "tmp")
         except IOError:
@@ -137,7 +137,7 @@ class TestReview_save(unittest.TestCase):
     def test_save_with_arg(self):
         rv = Review()
         with self.assertRaises(TypeError):
-            rv.save(None)
+            rv.save()
 
     def test_save_updates_file(self):
         rv = Review()
@@ -147,7 +147,7 @@ class TestReview_save(unittest.TestCase):
             self.assertIn(rvid, f.read())
 
 
-class TestReview_to_dict(unittest.TestCase):
+class TestReviewToDict(unittest.TestCase):
     """Unittests for testing to_dict method of the Review class."""
 
     def test_to_dict_type(self):
@@ -194,7 +194,7 @@ class TestReview_to_dict(unittest.TestCase):
     def test_to_dict_with_arg(self):
         rv = Review()
         with self.assertRaises(TypeError):
-            rv.to_dict(None)
+            rv.to_dict()
 
 
 if __name__ == "__main__":

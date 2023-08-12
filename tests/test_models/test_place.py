@@ -14,7 +14,7 @@ from time import sleep
 from models.place import Place
 
 
-class TestPlace_instantiation(unittest.TestCase):
+class TestPlaceInstantiation(unittest.TestCase):
     """Unittests for testing instantiation of the Place class."""
 
     def test_no_args_instantiates(self):
@@ -54,7 +54,7 @@ class TestPlace_instantiation(unittest.TestCase):
         pl = Place()
         self.assertEqual(str, type(Place.description))
         self.assertIn("description", dir(pl))
-        self.assertNotIn("desctiption", pl.__dict__)
+        self.assertNotIn("description", pl.__dict__)
 
     def test_number_rooms_is_public_class_attribute(self):
         pl = Place()
@@ -144,11 +144,11 @@ class TestPlace_instantiation(unittest.TestCase):
             Place(id=None, created_at=None, updated_at=None)
 
 
-class TestPlace_save(unittest.TestCase):
+class TestPlaceSave(unittest.TestCase):
     """Unittests for testing save method of the Place class."""
 
     @classmethod
-    def setUp(self):
+    def setUp(cls):
         try:
             os.rename("file.json", "tmp")
         except IOError:
@@ -185,7 +185,7 @@ class TestPlace_save(unittest.TestCase):
     def test_save_with_arg(self):
         pl = Place()
         with self.assertRaises(TypeError):
-            pl.save(None)
+            pl.save()
 
     def test_save_updates_file(self):
         pl = Place()
@@ -195,7 +195,7 @@ class TestPlace_save(unittest.TestCase):
             self.assertIn(plid, f.read())
 
 
-class TestPlace_to_dict(unittest.TestCase):
+class TestPlaceToDict(unittest.TestCase):
     """Unittests for testing to_dict method of the Place class."""
 
     def test_to_dict_type(self):
@@ -242,8 +242,9 @@ class TestPlace_to_dict(unittest.TestCase):
     def test_to_dict_with_arg(self):
         pl = Place()
         with self.assertRaises(TypeError):
-            pl.to_dict(None)
+            pl.to_dict()
 
 
 if __name__ == "__main__":
     unittest.main()
+

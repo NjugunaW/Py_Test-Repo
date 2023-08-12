@@ -14,7 +14,7 @@ from time import sleep
 from models.amenity import Amenity
 
 
-class TestAmenity_instantiation(unittest.TestCase):
+class TestAmenityInstantiation(unittest.TestCase):
     """Unittests for testing instantiation of the Amenity class."""
 
     def test_no_args_instantiates(self):
@@ -85,11 +85,11 @@ class TestAmenity_instantiation(unittest.TestCase):
             Amenity(id=None, created_at=None, updated_at=None)
 
 
-class TestAmenity_save(unittest.TestCase):
+class TestAmenitySave(unittest.TestCase):
     """Unittests for testing save method of the Amenity class."""
 
     @classmethod
-    def setUp(self):
+    def setUp(cls):
         try:
             os.rename("file.json", "tmp")
         except IOError:
@@ -126,7 +126,7 @@ class TestAmenity_save(unittest.TestCase):
     def test_save_with_arg(self):
         am = Amenity()
         with self.assertRaises(TypeError):
-            am.save(None)
+            am.save()
 
     def test_save_updates_file(self):
         am = Amenity()
@@ -136,7 +136,7 @@ class TestAmenity_save(unittest.TestCase):
             self.assertIn(amid, f.read())
 
 
-class TestAmenity_to_dict(unittest.TestCase):
+class TestAmenityToDict(unittest.TestCase):
     """Unittests for testing to_dict method of the Amenity class."""
 
     def test_to_dict_type(self):
@@ -183,7 +183,7 @@ class TestAmenity_to_dict(unittest.TestCase):
     def test_to_dict_with_arg(self):
         am = Amenity()
         with self.assertRaises(TypeError):
-            am.to_dict(None)
+            am.to_dict()
 
 
 if __name__ == "__main__":
