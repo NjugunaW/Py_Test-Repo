@@ -4,6 +4,8 @@ This program contains the entry point of the command intepreter
 """
 
 import cmd
+import json
+
 from models.base_model import BaseModel
 from models.user import User
 from models.city import City
@@ -16,6 +18,8 @@ from models import storage
 
 
 class HBNBCommand(cmd.Cmd):
+
+    intro = "Welcome to the HBNB console"
     # intro = r"""
     #
     #
@@ -155,9 +159,18 @@ class HBNBCommand(cmd.Cmd):
             elif len(update_params) < 3:
                 print("** value missing **")
             else:
-                HBNBCommand.do_update(self,
-                                      cls_name + ' ' + update_params[0] + ' ' + update_params[1] + ' ' + update_params[
-                                          2])
+                parts = arg.split('(')
+                if len(parts) == 2:
+                    upd_cmd_name = parts[0].strip()
+                    args_part = parts[1].rstrip(')').strip()
+
+                    if '.' in upd_cmd_name:
+                        obj_name, cmd = upd_cmd_name.split('.')
+                        if ',' in args_part:
+                            id_str, json_str = map(str.strip, args_part.split(',', 1))
+                            obj_id = id_str.strip('"')
+                            HBNBCommand.do_update(self, cls_name + ' ' + obj_id + ' ' + json_str)
+
 
     #         Custom Commands
 
@@ -296,16 +309,36 @@ class HBNBCommand(cmd.Cmd):
             print("** attribute name missing **")
         elif len(args) == 3:
             print("** value missing **")
-        # elif len(args) > 4:
-        #     del args[4:]
-        elif type(args[2]) == dict:
+        elif len(args) > 4:
             our_obj = objs[f"{args[0]}.{args[1]}"]
-            for k, v in args[2].items():
-                attr_type = type(our_obj.__class__.__dict__[k])
-                if k in our_obj.__class__.__dict__.keys() and attr_type in [str, int, float]:
-                    our_obj.__dict__[k] = attr_type(v)
+
+            if args[2][0] == "{" and args[-1][-1] == "}":
+                data_str = ' '.join(args[2:])
+                try:
+                    data = eval(data_str)
+                    if not isinstance(data, dict):
+                        print("** invalid dictionary syntax **")
+                        return
+
+                    for key, value in data.items():
+                        if key in our_obj.__class__.__dict__.keys():
+                            attr_type = type(our_obj.__class__.__dict__[key])
+                            our_obj.__dict__[key] = attr_type(value)
+                        else:
+                            our_obj.__dict__[key] = value
+
+                except SyntaxError:
+                    print("** invalid dictionary syntax **")
+                    return
+            else:
+                attribute = args[2]
+                value = " ".join(args[3:])
+
+                if attribute in our_obj.__class__.__dict__.keys():
+                    attr_type = type(our_obj.__class__.__dict__[attribute])
+                    our_obj.__dict__[attribute] = attr_type(value)
                 else:
-                    our_obj.__dict__[k] = v
+                    our_obj.__dict__[attribute] = value
         else:
             our_obj = objs[f"{args[0]}.{args[1]}"]
             if args[2] in our_obj.__class__.__dict__.keys():
@@ -322,7 +355,7 @@ class HBNBCommand(cmd.Cmd):
             arg:
 
         Example:
-            count User
+            count UserUser f650f143-6b7a-4630-a21b-562cda8f4a04 {'first_name': 'Chris', 'age': '32'}
         Returns:
 
         """
